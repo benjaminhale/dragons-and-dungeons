@@ -1,0 +1,198 @@
+Elements of Interaction
+
+
+Character
+
+ r
+    _
+   / \
+   \_/
+    |
+  --|--
+    |                                             
+    |                                             
+   | |                                             
+   | |  
+
+
+   ___       /
+  /   \     /
+  |o o|    /
+  \ ' /   /
+   ---   /
+    |   X
+ 3--|--B
+    | /
+    |
+   | \
+   / /
+   L L
+
+
+~$%&[]{}()=*+!#`7531902468
+;:,<.>'"-_/?@^\|
+                                                
+
+Enemies
+    Skeleton
+ i
+       ___ |
+      /   \|
+      |O O||
+      \ ^ /|
+       ||| |
+        -  |
+        -  +
+     3||-||E
+        -  |
+        -
+       - -
+       - -
+       - -
+       - -
+      -- -- 
+
+Classes
+   Hero
+   Enemy
+     Skeleton
+     Zombie
+     Bat
+     Werewolf
+     Dragon
+   Objects
+     Map
+
+   NPC
+
+
+Inventory
+  Stick
+  Sword
+  Flaming sword
+  Bow
+   Arrows
+  Boots
+  Armor
+  Helmet
+  Gold
+  Bomb
+  Resources
+   Iron
+   Wood
+    Stick
+    Log
+   Flint
+   Coal
+
+
+
+Objects
+  Scroll
+  Treasure chest
+  Key
+  Potion
+  Poison
+  Map
+  Gate
+  Food
+  Pets
+
+Shop
+  Potions
+
+Forge
+  Ingredients
+
+Display header
+  Health
+  Inventory
+  Character name
+   ORIGINAL GAME
+      Level: X
+      Hits: X/X
+      Str: X/X
+      Gold: XXX
+      Armor: X
+      Exp: X/X
+
+
+
+
+
+
+
+Start screen
+
+Dungeon Map
+
+Dungeon rooms
+
+ -----------------
+|R                |
+|                |
+ |             |-
+  |            |
+  |            |
+ |              |
+|                |
+ |             |-
+  -------------
+
+
+
+ ---------------------
+|R                    |
+ -----|             |-
+      |           |-
+      |        |--
+ -----|        |
+|             |--
+|                |
+ ---------|       |
+  |    |----------------
+ ---------|             |
+|    |------------------
+|    |
+|    |
+ ----
+
+Loop through all — chars:
+ Make it a space if above AND below are restricted
+ Make it a dash  if above or below is not restricted
+
+      --
+ ----|  |--------
+|                |
+ ----|  |--------
+      --
+
+     ---------
+    |         |
+   -|         |
+ -|       |---
+|            |
+|             |
+|             |-
+|               |
+ ----|          |
+|            |--
+ --|           |
+    -----------
+
+
+
+Frontend 
+ - renders each room
+ - does animation
+    - character movement
+    - battle animation
+
+Backend 
+ - sends new pages
+    - new room 
+    - a battle
+    - the entry screen
+ - Stores data
+    - user classes
+    - dungeon class
