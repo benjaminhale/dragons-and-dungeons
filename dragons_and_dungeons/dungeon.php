@@ -5,8 +5,8 @@ $dataArr = array(
               '/n—             '.
               '/n——      {{{     '.
               '/n——            '.
-              '/n—       W      '.
-              '/n    Z            '.
+              '/n—              '.
+              '/n            .     '.
               '/n————————  Noemie is the best  ',
               
     // "text" => "R /n          /n ",
