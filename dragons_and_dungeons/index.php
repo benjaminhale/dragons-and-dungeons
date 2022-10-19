@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
     <?php
-        include("head.php")
+        include("head.php");
     ?>
 
     <body>
         <div class='content'>
+            
+        
+        
 
 
-            <p id="welcome"></p>
-            <p id="dungeon"></p>
+            <p class='welcome' id="welcome"></p>
+            <p id="cave"></p>
             <script>
                 display = new Display();//Setup display class.
                 //Execute the script upon loading the page.
@@ -42,7 +45,7 @@
                     else if (["Space"].indexOf(evt.code) > -1) 
                     {
                         evt.preventDefault();
-                        display.dungeon();
+                        display.cave("cave");
                     }
                 }
 

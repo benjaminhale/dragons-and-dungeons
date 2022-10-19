@@ -6,6 +6,7 @@ class Display
         this.room = new Array();
         this.location = {x:0, y:0};
         this.restrictedChars = new Array();
+        this.exits = [];//{x:0, y:0};
     }
 
     render(pixelsXY, tag, error)
@@ -43,153 +44,50 @@ class Display
     {
         document.getElementById(tag).innerHTML += char;
     }
-    arrify(text)
-    {
-        let arr = new Array();
-        let nestedArr = new Array();
 
-        for(var i=0; i<text.length; i++)
-        {
-            if (i + 1 < text.length)//not last character
-            {
-                if (text[i] == '/' && text[i + 1] == 'n')//check for newline
-                {
-                    arr.push(nestedArr);
-                    nestedArr = new Array();
-                    i++;
-                }
-                else
-                {
-                    nestedArr.push(text[i]);
-                }
-            }
-            else//push final array onto meta array
-            {
-                nestedArr.push(text[i]);
-                arr.push(nestedArr);
-            }
-        }
-
-        return arr;
-    }
-
-    isPre(arr, index, toFind)
-    {
-        if (index < arr.indexOf(toFind)) return true;
-        else return false;
-    }
-
-    //Necessary for when vertBorder and horizBorder are the same character.
-    getLastSequential(char, arr, X)
-    {
-        if (arr[X+1] != char) return X;
-        return this.getLastSequential(char, arr, X+1);
-    }
-
-    addBorder(textArr)
-    {
-        const horizBorder = '-';
-        const vertBorder = '|';
-        const spaceHolder = '—';
-        const untouchable = ' ';
-        this.restrictedChars = [horizBorder, vertBorder, spaceHolder];
-        textArr.unshift(new Array());
-        textArr.push(new Array());
-
-        for(var i=0; i<textArr.length; i++)
-        {
-            //if first index is a —,
-            if(textArr[i][0] == spaceHolder)
-            {
-                //Prepend a space
-                textArr[i].unshift(untouchable);
-                // loop through rest of —
-                let spaceCounter = 1;
-                let currCell = textArr[i][spaceCounter];
-                while (currCell == spaceHolder)
-                {
-                    //Except for the last one, 
-                    if (textArr[i][spaceCounter+1] == spaceHolder)
-                    {
-                        //if the cell above AND below are a |, -, spaceholder, or pre-space,
-                        if ((this.restrictedChars.includes(textArr[i-1][spaceCounter]) ||
-                            ((textArr[i-1][spaceCounter] == untouchable) &&
-                             this.isPre(textArr[i-1], spaceCounter, vertBorder)))
-                             &&
-                            (this.restrictedChars.includes(textArr[i+1][spaceCounter-1])))
-                        {
-                            // replace with ' '
-                            textArr[i][spaceCounter] = untouchable;
-                        }
-                        //otherwise replace with '-'. 
-                        else textArr[i][spaceCounter] = horizBorder;
-                    }
-                    //replace the last one with a |
-                    else
-                    {
-                        textArr[i][spaceCounter] = vertBorder;
-                    }
-                    spaceCounter++;
-                    currCell = textArr[i][spaceCounter]
-                }
-            }
-            //and if it's first row, prepend a space
-            else if (i == 0)
-                textArr[i].unshift(untouchable);
-            //if it's not last one, prepend |
-            else if (i != textArr.length - 1) textArr[i].unshift(vertBorder)
-
-
-            //Except for LAST row, loop through BELOW row and append the necessary borders
-            if (i != textArr.length - 1)
-            {
-                if (textArr[i].length != 1)
-                {
-                    textArr[i].push(vertBorder);
-                }
-                while (textArr[i].length < textArr[i+1].length + 1)
-                {
-                    textArr[i].push(horizBorder);
-                }
-            }
-            //Except for FIRST row, loop through ABOVE row and append the necessary borders
-            if (i != 0)
-            {
-                while (textArr[i].length < textArr[i-1].lastIndexOf(vertBorder))
-                {
-                    //Handle when current column is earlier in the row than the previous row's "beginning"
-                    let realBeginning = this.getLastSequential(vertBorder, textArr[i-1], textArr[i-1].indexOf(vertBorder));
-                    if (realBeginning > textArr[i].length - 1)
-                        textArr[i].push(untouchable);
-                    else
-                        textArr[i].push(horizBorder);
-                }
-            }
-        }
-        return textArr;
-    }
-
+    
     async getJson(url)
     {
         const JSON = await fetch(url)
-            .then(async function (response) {
+            .then(async function (response)
+            {
                 return await response.json();
             })
-            .catch(function (error) {
+            .catch(function (error)
+            {
                 console.log("Error: " + error);
             });
         return JSON;
     }
 
-    async dungeon()
+    async cave(type)
     {
-        const dungeonJson = await this.getJson("dungeon.php");
-        let textArr = this.arrify(dungeonJson.text);
-        textArr = this.addBorder(textArr);
-        this.render(textArr, "dungeon");
+        const caveJson = await this.getJson("Cave.php");
+        let fullCave = [];
+
+        if (type == "first") 
+        {
+            fullCave = caveJson.first;
+            this.location = {x:3, y: 3}
+        }
+        else if (type == "cave")
+        {
+            fullCave = caveJson.cave;
+            this.location = caveJson.location;
+        }
         
-        this.room = textArr;
-        this.location = {x:1, y:1};
+        this.restrictedChars = caveJson.restricted;
+        this.exits = caveJson.exits;
+        this.room = fullCave;
+        //Add all exits
+        for (var i = 0; i < this.exits.length; i++)
+        {
+            this.room[this.exits[i].y][this.exits[i].x] = ' ';
+        }
+        //Position character
+        this.room[this.location.y][this.location.x] = 'R';
+
+        this.render(this.room, "cave");
     }
 
     async welcome()
@@ -197,7 +95,7 @@ class Display
         this.render('loading', 'welcome');
 
         const welcomeJSON = await this.getJson("welcome.php");
-        this.render(this.arrify(welcomeJSON.text), "welcome");
+        document.getElementById("welcome").innerHTML = welcomeJSON.text;
     }
 
     getLocation()
@@ -217,7 +115,7 @@ class Display
         this.room[targY][targX] = this.room[Y][X];
         this.room[Y][X] = targetLocationVal;
         this.location = {x:targX, y:targY};
-        this.render(this.room, "dungeon");
+        this.render(this.room, "cave");
     }
     
     moveLeft(X, Y)
@@ -249,6 +147,138 @@ class Display
 
 
 
+
+
+
+
+
+
+
+    // arrify(text)
+    // {
+    //     let arr = new Array();
+    //     let nestedArr = new Array();
+
+    //     for(var i=0; i<text.length; i++)
+    //     {
+    //         if (i + 1 < text.length)//not last character
+    //         {
+    //             if (text[i] == '/' && text[i + 1] == 'n')//check for newline
+    //             {
+    //                 arr.push(nestedArr);
+    //                 nestedArr = new Array();
+    //                 i++;
+    //             }
+    //             else
+    //             {
+    //                 nestedArr.push(text[i]);
+    //             }
+    //         }
+    //         else//push final array onto meta array
+    //         {
+    //             nestedArr.push(text[i]);
+    //             arr.push(nestedArr);
+    //         }
+    //     }
+
+    //     return arr;
+    // }
+    
+    // isPre(arr, index, toFind)
+    // {
+    //     if (index < arr.indexOf(toFind)) return true;
+    //     else return false;
+    // }
+
+    // //Necessary for when vertBorder and horizBorder are the same character.
+    // getLastSequential(char, arr, X)
+    // {
+    //     if (arr[X+1] != char) return X;
+    //     return this.getLastSequential(char, arr, X+1);
+    // }
+
+    // addBorder(textArr)
+    // {
+    //     const horizBorder = '-';
+    //     const vertBorder = '|';
+    //     const spaceHolder = '—';
+    //     const untouchable = ' ';
+    //     this.restrictedChars = [horizBorder, vertBorder, spaceHolder];
+    //     textArr.unshift(new Array());
+    //     textArr.push(new Array());
+
+    //     for(var i=0; i<textArr.length; i++)
+    //     {
+    //         //if first index is a —,
+    //         if(textArr[i][0] == spaceHolder)
+    //         {
+    //             //Prepend a space
+    //             textArr[i].unshift(untouchable);
+    //             // loop through rest of —
+    //             let spaceCounter = 1;
+    //             let currCell = textArr[i][spaceCounter];
+    //             while (currCell == spaceHolder)
+    //             {
+    //                 //Except for the last one, 
+    //                 if (textArr[i][spaceCounter+1] == spaceHolder)
+    //                 {
+    //                     //if the cell above AND below are a |, -, spaceholder, or pre-space,
+    //                     if ((this.restrictedChars.includes(textArr[i-1][spaceCounter]) ||
+    //                         ((textArr[i-1][spaceCounter] == untouchable) &&
+    //                          this.isPre(textArr[i-1], spaceCounter, vertBorder)))
+    //                          &&
+    //                         (this.restrictedChars.includes(textArr[i+1][spaceCounter-1])))
+    //                     {
+    //                         // replace with ' '
+    //                         textArr[i][spaceCounter] = untouchable;
+    //                     }
+    //                     //otherwise replace with '-'. 
+    //                     else textArr[i][spaceCounter] = horizBorder;
+    //                 }
+    //                 //replace the last one with a |
+    //                 else
+    //                 {
+    //                     textArr[i][spaceCounter] = vertBorder;
+    //                 }
+    //                 spaceCounter++;
+    //                 currCell = textArr[i][spaceCounter]
+    //             }
+    //         }
+    //         //and if it's first row, prepend a space
+    //         else if (i == 0)
+    //             textArr[i].unshift(untouchable);
+    //         //if it's not last one, prepend |
+    //         else if (i != textArr.length - 1) textArr[i].unshift(vertBorder)
+
+
+    //         //Except for LAST row, loop through BELOW row and append the necessary borders
+    //         if (i != textArr.length - 1)
+    //         {
+    //             if (textArr[i].length != 1)
+    //             {
+    //                 textArr[i].push(vertBorder);
+    //             }
+    //             while (textArr[i].length < textArr[i+1].length + 1)
+    //             {
+    //                 textArr[i].push(horizBorder);
+    //             }
+    //         }
+    //         //Except for FIRST row, loop through ABOVE row and append the necessary borders
+    //         if (i != 0)
+    //         {
+    //             while (textArr[i].length < textArr[i-1].lastIndexOf(vertBorder))
+    //             {
+    //                 //Handle when current column is earlier in the row than the previous row's "beginning"
+    //                 let realBeginning = this.getLastSequential(vertBorder, textArr[i-1], textArr[i-1].indexOf(vertBorder));
+    //                 if (realBeginning > textArr[i].length - 1)
+    //                     textArr[i].push(untouchable);
+    //                 else
+    //                     textArr[i].push(horizBorder);
+    //             }
+    //         }
+    //     }
+    //     return textArr;
+    // }
 
 
 

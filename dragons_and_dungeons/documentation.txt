@@ -1,3 +1,35 @@
+
+__TODO__
+
+  Get character moving between screens
+  Interact with monsters
+    Get battle screen displaying
+  Collect gold
+  Display header
+
+
+
+
+
+
+
+ ---------
+   |      |-------------
+  |                     |
+  |        |------------
+   --|            |
+    |             |
+ ---|       |-----
+     ---R---
+
+
+
+
+
+
+
+
+
 Elements of Interaction
 
 
@@ -30,7 +62,7 @@ Character
 
 
 ~$%&[]{}()=*+!#`7531902468
-;:,<.>'"-_/?@^\|
+;:<.>'"-_/?@^\|
                                                 
 
 Enemies
@@ -122,6 +154,8 @@ Display header
 
 
 
+
+
 Start screen
 
 Dungeon Map
@@ -133,7 +167,7 @@ Dungeon rooms
 |                |
  |             |-
   |            |
-  |            |
+  |            |  
  |              |
 |                |
  |             |-
