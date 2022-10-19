@@ -38,7 +38,7 @@ class Cave
         for ($i = 0; $i < $caveHeight; $i++)
         {
             $indentLength = rand(0, 5);
-            $rowLength = rand(10, 20);
+            $rowLength = rand(15, 20);
             //random row indent length 
             for ($j = 0; $j < $indentLength; $j++)
             {
